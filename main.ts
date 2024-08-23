@@ -1,14 +1,10 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { App, Editor, MarkdownPostProcessorContext, MarkdownRenderChild, MarkdownView, Notice, Plugin, TFile, Vault } from 'obsidian';
+import { DEFAULT_SETTINGS } from 'src/Constants';
+import MyPluginSettings from 'src/MyPluginSettings';
+import SampleModal from 'src/SampleModal';
+import SampleSettingTab from 'src/SampleSettingTab';
 
 // Remember to rename these classes and interfaces!
-
-interface MyPluginSettings {
-	mySetting: string;
-}
-
-const DEFAULT_SETTINGS: MyPluginSettings = {
-	mySetting: 'default'
-}
 
 export default class MyPlugin extends Plugin {
 	settings: MyPluginSettings;
@@ -16,17 +12,19 @@ export default class MyPlugin extends Plugin {
 	async onload() {
 		await this.loadSettings();
 
+		const { vault } = this.app;
+
 		// This creates an icon in the left ribbon.
 		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {
 			// Called when the user clicks the icon.
-			new Notice('This is a notice!');
+			new Notice(this.settings.mySetting);
 		});
 		// Perform additional things with the ribbon
 		ribbonIconEl.addClass('my-plugin-ribbon-class');
 
 		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
 		const statusBarItemEl = this.addStatusBarItem();
-		statusBarItemEl.setText('Status Bar Text');
+		statusBarItemEl.setText('Initial');
 
 		// This adds a simple command that can be triggered anywhere
 		this.addCommand({
@@ -76,6 +74,20 @@ export default class MyPlugin extends Plugin {
 
 		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
 		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
+		// ----------------------------------------------- My code
+		this.registerEvent(this.app.vault.on('modify', (x) => {
+			console.log('modify')
+		  }));
+		// this.registerInterval(window.setInterval(() => statusBarItemEl.setText(Date.now().toString()), 1000));
+        this.registerMarkdownCodeBlockProcessor('myblock', (source, el, ctx) => {
+
+			const filePath = ctx.sourcePath;
+			
+            // Create a new instance of MyMarkdownRenderChild
+            const child = new MyMarkdownRenderChild(el, filePath, this.app );
+            // Add it to the context so it gets managed properly
+            ctx.addChild(child);
+        });
 	}
 
 	onunload() {
@@ -91,44 +103,50 @@ export default class MyPlugin extends Plugin {
 	}
 }
 
-class SampleModal extends Modal {
-	constructor(app: App) {
-		super(app);
-	}
+// Custom MarkdownRenderChild class
+class MyMarkdownRenderChild extends MarkdownRenderChild {
+    private filePath: string;
+	private app: App;
+	
+    constructor(containerEl: HTMLElement, filePath: string, app: App) {
+        super(containerEl);
+		this.filePath = filePath;
+		this.app = app;
+		
+    }
 
-	onOpen() {
-		const {contentEl} = this;
-		contentEl.setText('Woah!');
-	}
+    onload() {
+		//Static part. Not updated
+		const staticElement = this.containerEl.createEl('div');
+		staticElement.textContent = `${this.filePath}`;
+		
+        // Create an element to display the time
+        const timeElement = this.containerEl.createEl('div');
+        this.updateContent(timeElement);
 
-	onClose() {
-		const {contentEl} = this;
-		contentEl.empty();
-	}
-}
+        // Update the content every second
+        this.registerInterval(window.setInterval(() => {
+            this.updateContent(timeElement);
+        }, 1000));
+    }
 
-class SampleSettingTab extends PluginSettingTab {
-	plugin: MyPlugin;
+    // Function to update the content of the timeElement
+    private updateContent(timeElement: HTMLElement) {
+		console.log("updateContent");
+        const now = new Date();
+        timeElement.textContent = `Current time: ${now.toLocaleTimeString()}`;
 
-	constructor(app: App, plugin: MyPlugin) {
-		super(app, plugin);
-		this.plugin = plugin;
-	}
+		// Write to file
 
-	display(): void {
-		const {containerEl} = this;
-
-		containerEl.empty();
-
-		new Setting(containerEl)
-			.setName('Setting #1')
-			.setDesc('It\'s a secret')
-			.addText(text => text
-				.setPlaceholder('Enter your secret')
-				.setValue(this.plugin.settings.mySetting)
-				.onChange(async (value) => {
-					this.plugin.settings.mySetting = value;
-					await this.plugin.saveSettings();
-				}));
-	}
+		// const file = this.app.vault.getFileByPath(this.filePath);
+		// if(file !== null){
+		// 	debugger;
+		// 	this.app.vault.process(file, (data) => {
+		// 		return data.replace(
+		// 			            /```myblock[\s\S]*?```/g,
+        //     `\`\`\`myblock\n${now.toLocaleTimeString()}\n\`\`\``
+		// 		);
+		// 	  })
+		// }
+    }
 }
