@@ -3,7 +3,7 @@ export type TaskPath = {
     subpaths: string[];
 }
 
-export default interface MyPluginSettings {
+export default interface PluginSettings {
     mySetting: string;
     inProgressTaskStatusSymbol: string;
     taskPaths: TaskPath[];

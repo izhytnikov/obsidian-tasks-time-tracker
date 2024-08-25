@@ -1,5 +1,5 @@
 import { App, TFile } from "obsidian";
-import MyPluginSettings from "src/Settings/MyPluginSettings";
+import PluginSettings from "src/Settings/PluginSettings";
 import FileParser from "src/Parsers/FileParser";
 import Task from "src/Parsers/Task";
 import { EVENTS } from "src/Constants";
@@ -7,10 +7,10 @@ import FileChangedEvent from "src/Events/FileChangedEvent";
 
 export default class MetadataChangedEventHandler {
     #app: App;
-    #settings: MyPluginSettings;
+    #settings: PluginSettings;
     #fileParser: FileParser;
 
-    constructor(app: App, settings: MyPluginSettings) {
+    constructor(app: App, settings: PluginSettings) {
         this.#app = app;
         this.#settings = settings;
         this.#fileParser = new FileParser();

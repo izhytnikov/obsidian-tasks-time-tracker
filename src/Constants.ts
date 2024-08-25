@@ -1,6 +1,6 @@
-import MyPluginSettings from "./Settings/MyPluginSettings";
+import PluginSettings from "./Settings/PluginSettings";
 
-export const DEFAULT_SETTINGS: MyPluginSettings = {
+export const DEFAULT_SETTINGS: PluginSettings = {
     mySetting: "default",
     inProgressTaskStatusSymbol: "/",
     taskPaths: [

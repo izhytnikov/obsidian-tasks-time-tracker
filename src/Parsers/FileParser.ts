@@ -1,8 +1,7 @@
-import IFileParser from "./IFileParser";
 import Task from "./Task";
 import { DataObject, getAPI } from "obsidian-dataview";
 
-export default class FileParser implements IFileParser {
+export default class FileParser {
     public getTasksBySubpaths(path: string, subPaths: string[]): Task[] {
         const dataView = getAPI();
         const page = dataView.page(path);
