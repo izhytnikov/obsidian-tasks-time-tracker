@@ -1,8 +1,11 @@
-import { App, Editor, MarkdownPostProcessorContext, MarkdownRenderChild, MarkdownView, Notice, Plugin, TFile, Vault } from 'obsidian';
-import { DEFAULT_SETTINGS } from 'src/Constants';
-import MyPluginSettings from 'src/MyPluginSettings';
+import { App, Editor, MarkdownRenderChild, MarkdownView, Notice, Plugin, TFile } from 'obsidian';
+import { DEFAULT_SETTINGS, EVENTS } from 'src/Constants';
+import MyPluginSettings from 'src/Settings/MyPluginSettings';
+import FileParser from 'src/Parsers/FileParser';
 import SampleModal from 'src/SampleModal';
 import SampleSettingTab from 'src/SampleSettingTab';
+import MetadataChangedEventHandler from 'src/EventHandler/MetadataChangedEventHandler';
+import FileChangedEvent from 'src/Events/FileChangedEvent';
 
 // Remember to rename these classes and interfaces!
 
@@ -75,19 +78,20 @@ export default class MyPlugin extends Plugin {
 		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
 		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
 		// ----------------------------------------------- My code
-		this.registerEvent(this.app.vault.on('modify', (x) => {
-			console.log('modify')
-		  }));
+		const mceh = new MetadataChangedEventHandler(this.app, this.settings);
+		this.registerEvent(this.app.metadataCache.on(EVENTS.DATAVIEW.METADATA_CHANGE, (eventName: string, file: TFile) => mceh.handle(eventName, file)));
+		this.registerEvent(this.app.vault.on(EVENTS.TASKS_TIME_TRACKER.FILE_CHANGED, (event: FileChangedEvent) => console.log(event)));
+
 		// this.registerInterval(window.setInterval(() => statusBarItemEl.setText(Date.now().toString()), 1000));
-        this.registerMarkdownCodeBlockProcessor('myblock', (source, el, ctx) => {
+		this.registerMarkdownCodeBlockProcessor('myblock', (source, el, ctx) => {
 
 			const filePath = ctx.sourcePath;
-			
-            // Create a new instance of MyMarkdownRenderChild
-            const child = new MyMarkdownRenderChild(el, filePath, this.app );
-            // Add it to the context so it gets managed properly
-            ctx.addChild(child);
-        });
+
+			// Create a new instance of MyMarkdownRenderChild
+			const child = new MyMarkdownRenderChild(el, filePath, this.app);
+			// Add it to the context so it gets managed properly
+			ctx.addChild(child);
+		});
 	}
 
 	onunload() {
@@ -105,48 +109,52 @@ export default class MyPlugin extends Plugin {
 
 // Custom MarkdownRenderChild class
 class MyMarkdownRenderChild extends MarkdownRenderChild {
-    private filePath: string;
+	private filePath: string;
 	private app: App;
-	
-    constructor(containerEl: HTMLElement, filePath: string, app: App) {
-        super(containerEl);
+
+	constructor(containerEl: HTMLElement, filePath: string, app: App) {
+		super(containerEl);
 		this.filePath = filePath;
 		this.app = app;
-		
-    }
 
-    onload() {
+	}
+
+	onload() {
 		//Static part. Not updated
 		const staticElement = this.containerEl.createEl('div');
 		staticElement.textContent = `${this.filePath}`;
-		
-        // Create an element to display the time
-        const timeElement = this.containerEl.createEl('div');
-        this.updateContent(timeElement);
 
-        // Update the content every second
-        this.registerInterval(window.setInterval(() => {
-            this.updateContent(timeElement);
-        }, 1000));
-    }
+		// Create an element to display the time
+		const timeElement = this.containerEl.createEl('div');
+		this.updateContent(timeElement);
 
-    // Function to update the content of the timeElement
-    private updateContent(timeElement: HTMLElement) {
+		// Update the content every second
+		this.registerInterval(window.setInterval(() => {
+			this.updateContent(timeElement);
+		}, 1000));
+	}
+
+	// Function to update the content of the timeElement
+	private updateContent(timeElement: HTMLElement) {
 		console.log("updateContent");
-        const now = new Date();
-        timeElement.textContent = `Current time: ${now.toLocaleTimeString()}`;
+		const now = new Date();
+		timeElement.textContent = `Current time: ${now.toLocaleTimeString()}`;
+
+		const parser = new FileParser();
+		const a = parser.getTasksBySubpaths(this.filePath, ["General", "DGeneral"]);
 
 		// Write to file
+		const file = this.app.vault.getFileByPath(this.filePath);
 
-		// const file = this.app.vault.getFileByPath(this.filePath);
-		// if(file !== null){
-		// 	debugger;
-		// 	this.app.vault.process(file, (data) => {
-		// 		return data.replace(
-		// 			            /```myblock[\s\S]*?```/g,
-        //     `\`\`\`myblock\n${now.toLocaleTimeString()}\n\`\`\``
-		// 		);
-		// 	  })
-		// }
-    }
+		if (file !== null) {
+
+
+			// this.app.vault.process(file, (data) => {
+			// 	return data.replace(
+			// 		            /```myblock[\s\S]*?```/g,
+			// `\`\`\`myblock\n${now.toLocaleTimeString()}\n\`\`\``
+			// 	);
+			//   })
+		}
+	}
 }

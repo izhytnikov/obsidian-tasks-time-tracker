@@ -2,16 +2,16 @@ import { DateTime } from "obsidian-dataview";
 import Nullable from "src/Utils/Nullable";
 
 export default class Task {
-    #status: string;
+    #statusSymbol: string;
     #scheduledDate: Nullable<DateTime>;
 
-    constructor(status: string, scheduledDate: Nullable<DateTime>) {
-        this.#status = status;
+    constructor(statusSymbol: string, scheduledDate: Nullable<DateTime>) {
+        this.#statusSymbol = statusSymbol;
         this.#scheduledDate = scheduledDate;
     }
 
-    public getStatus(): string {
-        return this.#status;
+    public getStatusSymbol(): string {
+        return this.#statusSymbol;
     }
 
     public getScheduledDate(): Nullable<Date> {

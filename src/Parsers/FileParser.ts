@@ -3,7 +3,7 @@ import Task from "./Task";
 import { DataObject, getAPI } from "obsidian-dataview";
 
 export default class FileParser implements IFileParser {
-    getTasksBySubpaths(path: string, subPaths: string[]): Task[] {
+    public getTasksBySubpaths(path: string, subPaths: string[]): Task[] {
         const dataView = getAPI();
         const page = dataView.page(path);
         if (page == null) {
