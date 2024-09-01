@@ -18,3 +18,5 @@ export default class Nullable<T> {
         return this.#value !== null && this.#value !== undefined;
     }
 }
+
+export type Nullable2<T> = T | null;
