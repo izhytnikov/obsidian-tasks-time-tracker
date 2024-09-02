@@ -1,9 +1,11 @@
 import { Events, Plugin, TFile } from 'obsidian';
 import { DEFAULT_SETTINGS, EVENTS, TASKS_TIME_TRACKER_CODE_BLOCK_NAME } from 'src/Constants';
-import PluginSettings, { Duration, TaskLog } from 'src/Settings/PluginSettings';
 import MetadataChangedEventHandler from 'src/EventHandler/MetadataChangedEventHandler';
 import FileChangedEvent from 'src/Events/FileChangedEvent';
 import TimeTrackerBlockRenderer from 'src/BlockRenderers/TimeTrackerBlockRenderer';
+import PluginSettings from 'src/Settings/PluginSettings';
+import { Duration } from 'src/Settings/Duration';
+import TaskLog from 'src/Settings/TaskLog';
 
 export default class MyPlugin extends Plugin {
 	settings: PluginSettings;
@@ -21,29 +23,34 @@ export default class MyPlugin extends Plugin {
 
 			event.dateTaskLogs.forEach(log => {
 				const nowDate = new Date(Date.now());
-				const key = log.getDate().toUTCString();
+				const key = log.getDate().toDateString();
 
 				const currentDateLog = this.settings.dateLogs[key];
 				if (!currentDateLog) {
 					if (log.getIsTaskInProgress()) {
-						const durations = [new Duration(nowDate)];
-						this.settings.dateLogs[key] = [new TaskLog(event.fileName, durations)];
+						this.settings.dateLogs[key] = [new TaskLog(event.fileName, [new Duration(nowDate)])];
 					}
 				} else {
-					currentDateLog.forEach(taskLog => {
-						if (taskLog.taskName === event.getFileName()) {
-							if (log.getIsTaskInProgress()) {
-								if (taskLog.durations.every(duration => !duration.isInProgress())) {
-									taskLog.durations.push(new Duration(nowDate));
-								}
-							} else {
-								const inProgressTask = taskLog.durations.find(duration => duration.isInProgress());
-								if (inProgressTask) {
-									inProgressTask.setEndDate(nowDate);
-								}
+					const relatedTaskLog = currentDateLog.find(taskLog => taskLog.taskName === event.getFileName());
+					if (relatedTaskLog) {
+						if (log.getIsTaskInProgress()) {
+							if (relatedTaskLog.durations.every((duration: Duration) => !duration.isInProgress2())) {
+								relatedTaskLog.durations.push(new Duration(nowDate));
+							}
+						} else {
+							const inProgressTask = relatedTaskLog.durations.find((duration: Duration) => {
+								console.log(duration);
+								return duration.isInProgress2();
+							});
+							if (inProgressTask) {
+								inProgressTask.setEndDate(nowDate);
 							}
 						}
-					})
+					} else {
+						if (log.getIsTaskInProgress()) {
+							currentDateLog.push(new TaskLog(event.fileName, [new Duration(nowDate)]))
+						}
+					}
 				}
 			})
 
