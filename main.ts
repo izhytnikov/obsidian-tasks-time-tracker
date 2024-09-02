@@ -20,7 +20,7 @@ export default class MyPlugin extends Plugin {
 
 		this.registerEvent((this.app.vault as Events).on(EVENTS.TASKS_TIME_TRACKER.FILE_CHANGED, async (event: FileChangedEvent) => {
 			event.dateTaskLogs.forEach(log => {
-				const nowDate = new Date(Date.now());
+				const nowDate = new Date(Date.now()).toISOString();
 				const key = log.getDate().toDateString();
 
 				const currentDateLog = this.settings.dateLogs[key];
@@ -32,13 +32,13 @@ export default class MyPlugin extends Plugin {
 					const taskLog = currentDateLog.find(taskLog => taskLog.taskName === event.getFileName());
 					if (taskLog) {
 						if (log.getIsTaskInProgress()) {
-							if (taskLog.durations.every(duration => duration.endDate !== null)) {
+							if (taskLog.durations.every(duration => duration.endDateString !== null)) {
 								taskLog.durations.push(new Duration(nowDate));
 							}
 						} else {
-							const inProgressTask = taskLog.durations.find(duration => duration.endDate === null);
+							const inProgressTask = taskLog.durations.find(duration => duration.endDateString === null);
 							if (inProgressTask) {
-								inProgressTask.endDate = nowDate;
+								inProgressTask.endDateString = nowDate;
 							}
 						}
 					} else {

@@ -1,14 +1,12 @@
 import PluginSettings from "./Settings/PluginSettings";
 
 export const DEFAULT_SETTINGS: PluginSettings = {
-    mySetting: "default",
     inProgressTaskStatusSymbol: "/",
     taskPaths: [
         { path: "Meetings", subpaths: ["Meeting-specific"] },
         { path: "Tasks/Specific", subpaths: ["General", "Task-specific"] }
     ],
     dailyNoteDateFormat: "yyyy-MM-dd",
-    dailyNotesPath: "Daily notes",
     dateLogs: {}
 }
 

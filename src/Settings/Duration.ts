@@ -1,10 +1,10 @@
 import { Nullable2 } from "src/Utils/Nullable";
 
 export default class Duration {
-    startDate: Date;
-    endDate: Nullable2<Date> = null;
+    startDateString: string;
+    endDateString: Nullable2<string> = null;
 
-    constructor(startDate: Date) {
-        this.startDate = startDate;
+    constructor(startDate: string) {
+        this.startDateString = startDate;
     }
 }
