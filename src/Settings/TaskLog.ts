@@ -1,4 +1,4 @@
-import { Duration } from "./Duration";
+import Duration from "./Duration";
 
 export default class TaskLog {
     taskName: string;

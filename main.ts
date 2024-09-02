@@ -4,7 +4,7 @@ import MetadataChangedEventHandler from 'src/EventHandler/MetadataChangedEventHa
 import FileChangedEvent from 'src/Events/FileChangedEvent';
 import TimeTrackerBlockRenderer from 'src/BlockRenderers/TimeTrackerBlockRenderer';
 import PluginSettings from 'src/Settings/PluginSettings';
-import { Duration } from 'src/Settings/Duration';
+import Duration from 'src/Settings/Duration';
 import TaskLog from 'src/Settings/TaskLog';
 
 export default class MyPlugin extends Plugin {
@@ -19,8 +19,6 @@ export default class MyPlugin extends Plugin {
 			metadataChangedEventHandler.handle(eventName, file)));
 
 		this.registerEvent((this.app.vault as Events).on(EVENTS.TASKS_TIME_TRACKER.FILE_CHANGED, async (event: FileChangedEvent) => {
-			console.log(event);
-
 			event.dateTaskLogs.forEach(log => {
 				const nowDate = new Date(Date.now());
 				const key = log.getDate().toDateString();
@@ -31,19 +29,16 @@ export default class MyPlugin extends Plugin {
 						this.settings.dateLogs[key] = [new TaskLog(event.fileName, [new Duration(nowDate)])];
 					}
 				} else {
-					const relatedTaskLog = currentDateLog.find(taskLog => taskLog.taskName === event.getFileName());
-					if (relatedTaskLog) {
+					const taskLog = currentDateLog.find(taskLog => taskLog.taskName === event.getFileName());
+					if (taskLog) {
 						if (log.getIsTaskInProgress()) {
-							if (relatedTaskLog.durations.every((duration: Duration) => !duration.isInProgress2())) {
-								relatedTaskLog.durations.push(new Duration(nowDate));
+							if (taskLog.durations.every(duration => duration.endDate !== null)) {
+								taskLog.durations.push(new Duration(nowDate));
 							}
 						} else {
-							const inProgressTask = relatedTaskLog.durations.find((duration: Duration) => {
-								console.log(duration);
-								return duration.isInProgress2();
-							});
+							const inProgressTask = taskLog.durations.find(duration => duration.endDate === null);
 							if (inProgressTask) {
-								inProgressTask.setEndDate(nowDate);
+								inProgressTask.endDate = nowDate;
 							}
 						}
 					} else {

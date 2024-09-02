@@ -27,7 +27,6 @@ export default class TimeTrackerBlockRenderer extends MarkdownRenderChild {
     }
 
     private updateContent(timeElement: HTMLElement) {
-        console.log("updateContent");
         const now = new Date();
         timeElement.textContent = `Current time: ${now.toLocaleTimeString()}`;
     }
