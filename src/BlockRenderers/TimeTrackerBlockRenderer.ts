@@ -1,17 +1,17 @@
 import { MarkdownRenderChild, Vault } from "obsidian";
+import TaskLog from "src/Settings/TaskLog";
 
 export default class TimeTrackerBlockRenderer extends MarkdownRenderChild {
-    #vault: Vault;
+    #taskLogs: TaskLog[];
     #contextFilePath: string;
 
-    constructor(containerElement: HTMLElement, vault: Vault, contextFilePath: string) {
+    constructor(containerElement: HTMLElement, taskLogs: TaskLog[]) {
         super(containerElement);
-        this.#vault = vault;
-        this.#contextFilePath = contextFilePath;
+        this.#taskLogs = taskLogs;
     }
 
     onload() {
-        this.containerEl.createEl("h2").textContent = "Timeline";
+        this.containerEl.createEl("p").textContent = "Timeline";
         const staticElement = this.containerEl.createEl('div');
         staticElement.textContent = `${this.#contextFilePath}`;
 

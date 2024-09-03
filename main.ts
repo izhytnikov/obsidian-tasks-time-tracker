@@ -53,8 +53,15 @@ export default class MyPlugin extends Plugin {
 		}));
 
 		this.registerMarkdownCodeBlockProcessor(TASKS_TIME_TRACKER_CODE_BLOCK_NAME, (source, element, context) => {
-			const child = new TimeTrackerBlockRenderer(element, this.app.vault, context.sourcePath);
-			context.addChild(child);
+			const file = this.app.vault.getFileByPath(context.sourcePath);
+			if (file !== null) {
+				const dateKey = new Date(`${file.basename}T00:00:00`).toDateString();
+				const currentDateLog = this.settings.dateLogs[dateKey]
+				if (currentDateLog) {
+					const child = new TimeTrackerBlockRenderer(element, currentDateLog);
+					context.addChild(child);
+				}
+			}
 		});
 	}
 
