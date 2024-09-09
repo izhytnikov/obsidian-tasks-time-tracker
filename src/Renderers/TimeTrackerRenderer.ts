@@ -1,8 +1,8 @@
 import { MarkdownRenderChild } from "obsidian";
-import Duration from "src/Settings/Duration";
 import TaskLog from "src/Settings/TaskLog";
 import { Nullable } from "src/Utils/Nullable";
-import Interval from "./Interval";
+import Duration from "./Duration";
+import Interval from "src/Settings/Interval";
 
 export default class TimeTrackerRenderer extends MarkdownRenderChild {
     #taskLogs: TaskLog[];
@@ -73,7 +73,7 @@ export default class TimeTrackerRenderer extends MarkdownRenderChild {
         return dateString !== null ? new Date(dateString).toLocaleTimeString([], { hour12: false }) : "";
     }
 
-    private getIntervalFromSeconds(seconds: number): Interval {
+    private getIntervalFromSeconds(seconds: number): Duration {
         const hours = Math.floor(seconds / 3600);
         seconds -= hours * 3600;
 
@@ -82,10 +82,10 @@ export default class TimeTrackerRenderer extends MarkdownRenderChild {
 
         seconds = Math.ceil(seconds % 60);
 
-        return new Interval(hours, minutes, seconds);
+        return new Duration(hours, minutes, seconds);
     }
 
-    private getDurationDiffSeconds(duration: Duration): number {
+    private getDurationDiffSeconds(duration: Interval): number {
         const fromDate = new Date(duration.startDateString);
         const toDate = duration.endDateString !== null ? new Date(duration.endDateString) : new Date(Date.now());
         const diff = toDate.getTime() - fromDate.getTime();

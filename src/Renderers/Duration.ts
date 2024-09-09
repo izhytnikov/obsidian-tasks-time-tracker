@@ -1,4 +1,4 @@
-export default class Interval {
+export default class Duration {
     #hours: number;
     #minutes: number;
     #seconds: number;
