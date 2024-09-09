@@ -1,10 +1,10 @@
 import Duration from "./Duration";
 
 export default class TaskLog {
-    taskName: string;
-    durations: Duration[];
+    public taskName: string;
+    public durations: Duration[];
 
-    constructor(taskName: string, durations: Duration[]) {
+    public constructor(taskName: string, durations: Duration[]) {
         this.taskName = taskName;
         this.durations = durations;
     }

@@ -1,41 +1,26 @@
-import { MarkdownRenderChild, Vault } from "obsidian";
+import { MarkdownRenderChild } from "obsidian";
 import Duration from "src/Settings/Duration";
 import TaskLog from "src/Settings/TaskLog";
-import { Nullable2 } from "src/Utils/Nullable";
+import { Nullable } from "src/Utils/Nullable";
+import Interval from "./Interval";
 
-export class Interval {
-    hours: number;
-    minutes: number;
-    seconds: number;
-
-    constructor(hours: number, minutes: number, seconds: number) {
-        this.hours = hours;
-        this.minutes = minutes;
-        this.seconds = seconds;
-    }
-
-    public toString(): string {
-        return `${this.hours.toString().padStart(2, "0")}:${this.minutes.toString().padStart(2, "0")}:${this.seconds.toString().padStart(2, "0")}`;
-    }
-}
-
-export default class TimeTrackerBlockRenderer extends MarkdownRenderChild {
+export default class TimeTrackerRenderer extends MarkdownRenderChild {
     #taskLogs: TaskLog[];
     #table: HTMLTableElement;
 
-    constructor(containerElement: HTMLElement, taskLogs: TaskLog[]) {
+    public constructor(containerElement: HTMLElement, taskLogs: TaskLog[]) {
         super(containerElement);
         this.#taskLogs = taskLogs;
     }
 
-    onload() {
+    public onload(): void {
         this.#table = this.containerEl.createEl('table');
         this.registerInterval(window.setInterval(() => {
             this.drawTable();
         }, 1000));
     }
 
-    private drawTable() {
+    private drawTable(): void {
         while (this.#table.rows.length > 0) {
             this.#table.deleteRow(0);
         }
@@ -84,23 +69,23 @@ export default class TimeTrackerBlockRenderer extends MarkdownRenderChild {
         })
     }
 
-    private getTimeString(dateString: Nullable2<string>) {
+    private getTimeString(dateString: Nullable<string>): string {
         return dateString !== null ? new Date(dateString).toLocaleTimeString([], { hour12: false }) : "";
     }
 
-    private getIntervalFromSeconds(seconds: number) {
-        var hours = Math.floor(seconds / 3600);
+    private getIntervalFromSeconds(seconds: number): Interval {
+        const hours = Math.floor(seconds / 3600);
         seconds -= hours * 3600;
 
-        var minutes = Math.floor(seconds / 60) % 60;
+        const minutes = Math.floor(seconds / 60) % 60;
         seconds -= minutes * 60;
 
-        var seconds = Math.ceil(seconds % 60);
+        seconds = Math.ceil(seconds % 60);
 
         return new Interval(hours, minutes, seconds);
     }
 
-    private getDurationDiffSeconds(duration: Duration) {
+    private getDurationDiffSeconds(duration: Duration): number {
         const fromDate = new Date(duration.startDateString);
         const toDate = duration.endDateString !== null ? new Date(duration.endDateString) : new Date(Date.now());
         const diff = toDate.getTime() - fromDate.getTime();

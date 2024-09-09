@@ -1,38 +1,37 @@
 import { App, TFile } from "obsidian";
 import PluginSettings from "src/Settings/PluginSettings";
 import FileParser from "src/Parsers/FileParser";
-import Task from "src/Parsers/Task";
 import { EVENTS } from "src/Constants";
-import FileChangedEvent, { DateTaskLog } from "src/Events/FileChangedEvent";
-import { group } from "console";
+import FileChangedEvent from "src/Events/FileChangedEvent";
+import DateTaskLog from "src/Events/DateTaskLog";
 
-export default class MetadataChangedEventHandler {
+export default class DataviewMetadataChangedEventHandler {
     #app: App;
     #settings: PluginSettings;
     #fileParser: FileParser;
 
-    constructor(app: App, settings: PluginSettings) {
+    public constructor(app: App, settings: PluginSettings) {
         this.#app = app;
         this.#settings = settings;
         this.#fileParser = new FileParser();
     }
 
-    handle(eventName: string, file: TFile) {
+    public handle(eventName: string, file: TFile): void {
         if (eventName === EVENTS.DATAVIEW.UPDATE) {
             this.#settings.taskPaths.forEach(taskPath => {
                 if (file.path.startsWith(taskPath.path)) {
                     const tasks = this.#fileParser.getTasksBySubpaths(file.path, taskPath.subpaths);
 
                     const res = tasks.reduce((acc, task) => {
-                        if (!task.getScheduledDate().hasValue()) {
+                        const scheduledDate = task.getScheduledDate();
+                        if (scheduledDate === null) {
                             return acc;
                         }
 
-                        const date = task.getScheduledDate().getValue()!;
                         const isCurrentTaskInProgress = task.getStatusSymbol() === this.#settings.inProgressTaskStatusSymbol;
-                        const currVal = acc.find(log => log.getDate().getTime() === date.getTime());
+                        const currVal = acc.find(log => log.getDate().getTime() === scheduledDate.getTime());
                         if (!currVal) {
-                            acc.push(new DateTaskLog(date, isCurrentTaskInProgress))
+                            acc.push(new DateTaskLog(scheduledDate, isCurrentTaskInProgress))
                             return acc;
                         }
 
