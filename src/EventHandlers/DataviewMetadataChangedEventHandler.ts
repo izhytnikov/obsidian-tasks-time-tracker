@@ -1,6 +1,6 @@
 import { App, TFile } from "obsidian";
 import IPluginSettings from "src/Settings/IPluginSettings";
-import FileParser from "src/Parsers/FileParser";
+import TaskRetrieverService from "src/Services/TaskRetrieverService";
 import { EVENTS } from "src/Constants";
 import FileChangedEvent from "src/Events/FileChangedEvent";
 import DateTaskLog from "src/Events/DateTaskLog";
@@ -8,19 +8,19 @@ import DateTaskLog from "src/Events/DateTaskLog";
 export default class DataviewMetadataChangedEventHandler {
     #app: App;
     #settings: IPluginSettings;
-    #fileParser: FileParser;
+    #taskRetrieverService: TaskRetrieverService;
 
     public constructor(app: App, settings: IPluginSettings) {
         this.#app = app;
         this.#settings = settings;
-        this.#fileParser = new FileParser();
+        this.#taskRetrieverService = new TaskRetrieverService();
     }
 
     public handle(eventName: string, file: TFile): void {
         if (eventName === EVENTS.DATAVIEW.UPDATE) {
             this.#settings.taskPaths.forEach(taskPath => {
                 if (file.path.startsWith(taskPath.path)) {
-                    const tasks = this.#fileParser.getTasksBySubpaths(file.path, taskPath.subpaths);
+                    const tasks = this.#taskRetrieverService.getTasksBySubpaths(file.path, taskPath.subpaths);
 
                     const res = tasks.reduce((acc, task) => {
                         const scheduledDate = task.getScheduledDate();

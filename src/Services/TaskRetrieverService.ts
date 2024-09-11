@@ -1,7 +1,7 @@
 import Task from "./Task";
 import { DataObject, getAPI } from "obsidian-dataview";
 
-export default class FileParser {
+export default class TaskRetrieverService {
     public getTasksBySubpaths(path: string, subPaths: string[]): Task[] {
         const dataView = getAPI();
         const page = dataView.page(path);
