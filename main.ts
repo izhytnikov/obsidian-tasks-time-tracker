@@ -5,6 +5,7 @@ import FileChangedEvent from "src/Events/FileChangedEvent";
 import IPluginSettings from "src/Settings/IPluginSettings";
 import FileChangedEventHandler from "src/EventHandlers/FileChangedEventHandler";
 import TasksTimeTrackerCodeBlockProcessor from "src/CodeBlockProcessors/TasksTimeTrackerCodeBlockProcessor";
+import InProgressTaskStatusSymbolPluginSettingTab from "src/PluginSettingTabs/InProgressTaskStatusSymbolPluginSettingTab";
 
 export default class TasksTimeTrackerPlugin extends Plugin {
 	#settings: IPluginSettings;
@@ -14,6 +15,7 @@ export default class TasksTimeTrackerPlugin extends Plugin {
 
 		this.#registerEvents();
 		this.#registerMarkdownCodeBlockProcessors();
+		this.#addSettingTabs();
 	}
 
 	public async loadSettings(): Promise<void> {
@@ -39,5 +41,9 @@ export default class TasksTimeTrackerPlugin extends Plugin {
 
 		this.registerMarkdownCodeBlockProcessor(TASKS_TIME_TRACKER_CODE_BLOCK_NAME,
 			(_source, element, context) => tasksTimeTrackerCodeBlockProcessor.process(element, context));
+	}
+
+	#addSettingTabs(): void {
+		this.addSettingTab(new InProgressTaskStatusSymbolPluginSettingTab(this.app, this, this.#settings));
 	}
 }
