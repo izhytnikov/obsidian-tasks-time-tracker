@@ -1,5 +1,23 @@
-import Task from "./Task";
+import { Nullable } from "src/Utils/Nullable";
 import { DataObject, getAPI } from "obsidian-dataview";
+
+export class Task {
+    #statusSymbol: string;
+    #scheduledDate: Nullable<Date>;
+
+    public constructor(statusSymbol: string, scheduledDate: Nullable<Date>) {
+        this.#statusSymbol = statusSymbol;
+        this.#scheduledDate = scheduledDate;
+    }
+
+    public getStatusSymbol(): string {
+        return this.#statusSymbol;
+    }
+
+    public getScheduledDate(): Nullable<Date> {
+        return this.#scheduledDate;
+    }
+}
 
 export default class TaskRetrieverService {
     public getTasksBySubpaths(path: string, subPaths: string[]): Task[] {

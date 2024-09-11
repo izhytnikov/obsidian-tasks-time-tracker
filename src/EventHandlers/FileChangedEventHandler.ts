@@ -14,32 +14,32 @@ export default class FileChangedEventHandler {
     }
 
     public async handle(event: FileChangedEvent): Promise<void> {
-        event.getDateTaskLog().forEach(log => {
+        event.getDateTaskLogs().forEach(dateTaskLog => {
             const nowDate = new Date(Date.now()).toISOString();
-            const key = log.getDate().toDateString();
+            const logKey = dateTaskLog.getDate().toDateString();
             const fileName = event.getFileName();
 
-            const currentDateLog = this.#settings.dateLogs[key];
-            if (!currentDateLog) {
-                if (log.getIsTaskInProgress()) {
-                    this.#settings.dateLogs[key] = [new TaskLog(fileName, [new Interval(nowDate)])];
+            const dateLog = this.#settings.dateLogs[logKey];
+            if (!dateLog) {
+                if (dateTaskLog.isTaskInProgress()) {
+                    this.#settings.dateLogs[logKey] = [new TaskLog(fileName, [new Interval(nowDate)])];
                 }
             } else {
-                const taskLog = currentDateLog.find(taskLog => taskLog.taskName === event.getFileName());
+                const taskLog = dateLog.find(taskLog => taskLog.taskName === event.getFileName());
                 if (taskLog) {
-                    if (log.getIsTaskInProgress()) {
-                        if (taskLog.durations.every(duration => duration.endDateString !== null)) {
-                            taskLog.durations.push(new Interval(nowDate));
+                    if (dateTaskLog.isTaskInProgress()) {
+                        if (taskLog.intervals.every(interval => interval.endDateString !== null)) {
+                            taskLog.intervals.push(new Interval(nowDate));
                         }
                     } else {
-                        const inProgressTask = taskLog.durations.find(duration => duration.endDateString === null);
-                        if (inProgressTask) {
-                            inProgressTask.endDateString = nowDate;
+                        const inProgressInterval = taskLog.intervals.find(interval => interval.endDateString === null);
+                        if (inProgressInterval) {
+                            inProgressInterval.endDateString = nowDate;
                         }
                     }
                 } else {
-                    if (log.getIsTaskInProgress()) {
-                        currentDateLog.push(new TaskLog(fileName, [new Interval(nowDate)]))
+                    if (dateTaskLog.isTaskInProgress()) {
+                        dateLog.push(new TaskLog(fileName, [new Interval(nowDate)]))
                     }
                 }
             }

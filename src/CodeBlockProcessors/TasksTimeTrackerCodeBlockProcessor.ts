@@ -14,11 +14,11 @@ export default class TasksTimeTrackerCodeBlockProcessor {
     public process(element: HTMLElement, context: MarkdownPostProcessorContext): void {
         const file = this.#vault.getFileByPath(context.sourcePath);
         if (file !== null) {
-            const dateKey = new Date(`${file.basename}T00:00:00`).toDateString();
-            const currentDateLog = this.#settings.dateLogs[dateKey]
-            if (currentDateLog) {
-                const child = new TimeTrackerRenderer(element, currentDateLog);
-                context.addChild(child);
+            const logKey = new Date(`${file.basename}T00:00:00`).toDateString();
+            const dateLog = this.#settings.dateLogs[logKey]
+            if (dateLog) {
+                const renderer = new TimeTrackerRenderer(element, dateLog);
+                context.addChild(renderer);
             }
         }
     }

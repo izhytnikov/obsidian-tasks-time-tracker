@@ -1,9 +1,9 @@
 
 import { TaskPath } from "./TaskPath";
-import { DateLog } from "./DateLog";
+import { DateLogs } from "./DateLogs";
 
 export default interface IPluginSettings {
     inProgressTaskStatusSymbol: string;
     taskPaths: TaskPath[];
-    dateLogs: DateLog;
+    dateLogs: DateLogs;
 }

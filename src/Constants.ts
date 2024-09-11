@@ -19,4 +19,4 @@ export const EVENTS = {
     }
 }
 
-export const TASKS_TIME_TRACKER_CODE_BLOCK_NAME = 'tasks-time-tracker';
+export const TASKS_TIME_TRACKER_CODE_BLOCK_NAME = "tasks-time-tracker";

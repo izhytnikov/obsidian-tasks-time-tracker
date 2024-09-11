@@ -1,12 +1,69 @@
 import { MarkdownRenderChild } from "obsidian";
 import TaskLog from "src/Settings/TaskLog";
 import { Nullable } from "src/Utils/Nullable";
-import Duration from "./Duration";
 import Interval from "src/Settings/Interval";
+
+export class Duration {
+    #hours: number;
+    #minutes: number;
+    #seconds: number;
+
+    public constructor(hours: number, minutes: number, seconds: number) {
+        this.#hours = hours;
+        this.#minutes = minutes;
+        this.#seconds = seconds;
+    }
+
+    public getHours(): number {
+        return this.#hours;
+    }
+
+    public getMinutes(): number {
+        return this.#minutes;
+    }
+
+    public getSeconds(): number {
+        return this.#seconds;
+    }
+
+    public add(duration: Duration): void {
+        const totalSeconds = this.#seconds + duration.getSeconds();
+        const totalMinutes = this.#minutes + duration.getMinutes() + Math.floor(totalSeconds / 60);
+        const totalHours = this.#hours + duration.getHours() + Math.floor(totalMinutes / 60);
+
+        this.#seconds = totalSeconds % 60;
+        this.#minutes = totalMinutes % 60;
+        this.#hours = totalHours;
+    }
+
+    public toString(): string {
+        return `${this.#hours.toString().padStart(2, "0")}:${this.#minutes.toString().padStart(2, "0")}:${this.#seconds.toString().padStart(2, "0")}`;
+    }
+
+    public static fromInterval(interval: Interval): Duration {
+        const startDate = new Date(interval.startDateString);
+        const endDate = interval.endDateString !== null
+            ? new Date(interval.endDateString)
+            : new Date(Date.now());
+
+        const durationMilliseconds = endDate.getTime() - startDate.getTime();
+        let durationSeconds = durationMilliseconds / 1000;
+
+        const durationHours = Math.floor(durationSeconds / 3600);
+        durationSeconds -= durationHours * 3600;
+
+        const durationMinutes = Math.floor(durationSeconds / 60) % 60;
+        durationSeconds -= durationMinutes * 60;
+
+        durationSeconds = Math.ceil(durationSeconds % 60);
+
+        return new Duration(durationHours, durationMinutes, durationSeconds);
+    }
+}
 
 export default class TimeTrackerRenderer extends MarkdownRenderChild {
     #taskLogs: TaskLog[];
-    #table: HTMLTableElement;
+    #timeTrackerTable: HTMLTableElement;
 
     public constructor(containerElement: HTMLElement, taskLogs: TaskLog[]) {
         super(containerElement);
@@ -14,84 +71,65 @@ export default class TimeTrackerRenderer extends MarkdownRenderChild {
     }
 
     public onload(): void {
-        this.#table = this.containerEl.createEl('table');
+        this.#timeTrackerTable = this.containerEl.createEl("table");
         this.registerInterval(window.setInterval(() => {
-            this.drawTable();
+            this.drawTimeTrackerTable();
         }, 1000));
     }
 
-    private drawTable(): void {
-        while (this.#table.rows.length > 0) {
-            this.#table.deleteRow(0);
-        }
-        // Create the header row
-        const headerRow = this.#table.createEl('tr');
-        headerRow.createEl('th', { text: 'Task' });
-        headerRow.createEl('th', { text: 'Start' });
-        headerRow.createEl('th', { text: 'End' });
-        headerRow.createEl('th', { text: 'Duration' });
-        headerRow.createEl('th', { text: 'Task total' });
-        headerRow.createEl('th', { text: 'Total' });
+    private drawTimeTrackerTable(): void {
+        this.deleteTimeTrackerTableRows();
 
-        let wholeDayDuration = 0;
-        let wholeDayTotalCell: HTMLTableCellElement;
+        const headerRow = this.#timeTrackerTable.createEl("tr");
+        headerRow.createEl("th", { text: "Task" });
+        headerRow.createEl("th", { text: "Start" });
+        headerRow.createEl("th", { text: "End" });
+        headerRow.createEl("th", { text: "Duration" });
+        headerRow.createEl("th", { text: "Task duration" });
+        headerRow.createEl("th", { text: "Total duration" });
+
+        const dayDuration = new Duration(0, 0, 0);
+        let dayDurationCell: HTMLTableCellElement;
         this.#taskLogs.forEach((taskLog, taskLogIndex) => {
-            let taskDuration = 0;
-            let taskTotalCell: HTMLTableCellElement;
+            const taskDuration = new Duration(0, 0, 0);
+            let taskDurationCell: HTMLTableCellElement;
 
-            taskLog.durations.forEach((duration, durationIndex) => {
-                const durationDiffSeconds = this.getDurationDiffSeconds(duration);
-                const interval = this.getIntervalFromSeconds(durationDiffSeconds);
-                taskDuration += durationDiffSeconds;
-                wholeDayDuration += durationDiffSeconds;
+            taskLog.intervals.forEach((interval, intervalIndex) => {
+                const intervalDuration = Duration.fromInterval(interval);
+                taskDuration.add(intervalDuration);
+                dayDuration.add(intervalDuration);
 
-                const row = this.#table.createEl('tr');
-                if (durationIndex === 0) {
-                    row.createEl('td', { text: taskLog.taskName, attr: { rowspan: taskLog.durations.length.toString() } });
+                const row = this.#timeTrackerTable.createEl("tr");
+                if (intervalIndex === 0) {
+                    row.createEl("td", { text: taskLog.taskName, attr: { rowspan: taskLog.intervals.length.toString() } });
                 }
-                row.createEl('td', { text: this.getTimeString(duration.startDateString) });
-                row.createEl('td', { text: this.getTimeString(duration.endDateString) });
-                row.createEl('td', { text: interval.toString() });
-                if (durationIndex === 0) {
-                    taskTotalCell = row.createEl('td', { attr: { rowspan: taskLog.durations.length.toString() } });
+                row.createEl("td", { text: this.getTimeString(interval.startDateString) });
+                row.createEl("td", { text: this.getTimeString(interval.endDateString) });
+                row.createEl("td", { text: intervalDuration.toString() });
+                if (intervalIndex === 0) {
+                    taskDurationCell = row.createEl("td", { attr: { rowspan: taskLog.intervals.length.toString() } });
                     if (taskLogIndex === 0) {
-                        wholeDayTotalCell = row.createEl('td', { attr: { rowspan: '0' } });
+                        dayDurationCell = row.createEl("td", { attr: { rowspan: "0" } });
                     }
                 }
-                if (durationIndex === taskLog.durations.length - 1 && taskTotalCell) {
-                    taskTotalCell.innerText = this.getIntervalFromSeconds(taskDuration).toString();
+                if (intervalIndex === taskLog.intervals.length - 1 && taskDurationCell) {
+                    taskDurationCell.innerText = taskDuration.toString();
                 }
             })
 
-            if (taskLogIndex === this.#taskLogs.length - 1 && wholeDayTotalCell) {
-                wholeDayTotalCell.innerText = this.getIntervalFromSeconds(wholeDayDuration).toString();
+            if (taskLogIndex === this.#taskLogs.length - 1 && dayDurationCell) {
+                dayDurationCell.innerText = dayDuration.toString();
             }
         })
     }
 
+    private deleteTimeTrackerTableRows(): void {
+        while (this.#timeTrackerTable.rows.length > 0) {
+            this.#timeTrackerTable.deleteRow(0);
+        }
+    }
+
     private getTimeString(dateString: Nullable<string>): string {
         return dateString !== null ? new Date(dateString).toLocaleTimeString([], { hour12: false }) : "";
-    }
-
-    private getIntervalFromSeconds(seconds: number): Duration {
-        const hours = Math.floor(seconds / 3600);
-        seconds -= hours * 3600;
-
-        const minutes = Math.floor(seconds / 60) % 60;
-        seconds -= minutes * 60;
-
-        seconds = Math.ceil(seconds % 60);
-
-        return new Duration(hours, minutes, seconds);
-    }
-
-    private getDurationDiffSeconds(duration: Interval): number {
-        const fromDate = new Date(duration.startDateString);
-        const toDate = duration.endDateString !== null ? new Date(duration.endDateString) : new Date(Date.now());
-        const diff = toDate.getTime() - fromDate.getTime();
-
-
-        // get total seconds between the times
-        return diff / 1000;
     }
 }

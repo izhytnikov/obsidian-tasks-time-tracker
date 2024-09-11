@@ -3,7 +3,8 @@
     "parser": "@typescript-eslint/parser",
     "env": { "node": true },
     "plugins": [
-      "@typescript-eslint"
+      "@typescript-eslint",
+      "@stylistic/ts"
     ],
     "extends": [
       "eslint:recommended",
@@ -29,6 +30,7 @@
           "format": ["PascalCase"],
           "prefix": ["I"]
         }
-      ]
+      ],
+      "quotes": ["error", "double"]
     } 
   }

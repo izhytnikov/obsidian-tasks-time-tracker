@@ -2,10 +2,10 @@ import Interval from "./Interval";
 
 export default class TaskLog {
     public taskName: string;
-    public durations: Interval[];
+    public intervals: Interval[];
 
-    public constructor(taskName: string, durations: Interval[]) {
+    public constructor(taskName: string, intervals: Interval[]) {
         this.taskName = taskName;
-        this.durations = durations;
+        this.intervals = intervals;
     }
 }

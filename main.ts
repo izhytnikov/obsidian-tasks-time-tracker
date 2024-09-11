@@ -1,10 +1,10 @@
-import { Events, Plugin, TFile } from 'obsidian';
-import { DEFAULT_SETTINGS, EVENTS, TASKS_TIME_TRACKER_CODE_BLOCK_NAME } from 'src/Constants';
-import DataviewMetadataChangedEventHandler from 'src/EventHandlers/DataviewMetadataChangedEventHandler';
-import FileChangedEvent from 'src/Events/FileChangedEvent';
-import IPluginSettings from 'src/Settings/IPluginSettings';
-import FileChangedEventHandler from 'src/EventHandlers/FileChangedEventHandler';
-import TasksTimeTrackerCodeBlockProcessor from 'src/CodeBlockProcessors/TasksTimeTrackerCodeBlockProcessor';
+import { Events, Plugin, TFile } from "obsidian";
+import { DEFAULT_SETTINGS, EVENTS, TASKS_TIME_TRACKER_CODE_BLOCK_NAME } from "src/Constants";
+import DataviewMetadataChangedEventHandler from "src/EventHandlers/DataviewMetadataChangedEventHandler";
+import FileChangedEvent from "src/Events/FileChangedEvent";
+import IPluginSettings from "src/Settings/IPluginSettings";
+import FileChangedEventHandler from "src/EventHandlers/FileChangedEventHandler";
+import TasksTimeTrackerCodeBlockProcessor from "src/CodeBlockProcessors/TasksTimeTrackerCodeBlockProcessor";
 
 export default class TasksTimeTrackerPlugin extends Plugin {
 	#settings: IPluginSettings;
