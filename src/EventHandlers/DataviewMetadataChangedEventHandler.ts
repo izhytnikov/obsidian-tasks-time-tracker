@@ -17,7 +17,7 @@ export default class DataviewMetadataChangedEventHandler {
 
     public handle(eventName: string, file: TFile): void {
         if (eventName === EVENTS.DATAVIEW.UPDATE) {
-            this.#settings.taskPaths.forEach(taskPath => {
+            this.#settings.taskTypesSettings.forEach(taskPath => {
                 if (file.path.startsWith(taskPath.path)) {
                     const tasks = this.#taskRetrieverService.getTasksBySubpaths(file.path, taskPath.subpaths);
                     const dateTaskLogs = tasks.reduce((accumulator, task) => {

@@ -2,7 +2,7 @@ import IPluginSettings from "./Settings/IPluginSettings";
 
 export const DEFAULT_SETTINGS: IPluginSettings = {
     inProgressTaskStatusSymbol: "/",
-    taskPaths: [
+    taskTypesSettings: [
         { path: "Meetings", subpaths: ["Meeting-specific"] },
         { path: "Tasks/Specific", subpaths: ["General", "Task-specific"] }
     ],
