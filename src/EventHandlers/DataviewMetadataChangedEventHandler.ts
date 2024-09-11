@@ -1,5 +1,5 @@
 import { App, TFile } from "obsidian";
-import PluginSettings from "src/Settings/PluginSettings";
+import IPluginSettings from "src/Settings/IPluginSettings";
 import FileParser from "src/Parsers/FileParser";
 import { EVENTS } from "src/Constants";
 import FileChangedEvent from "src/Events/FileChangedEvent";
@@ -7,10 +7,10 @@ import DateTaskLog from "src/Events/DateTaskLog";
 
 export default class DataviewMetadataChangedEventHandler {
     #app: App;
-    #settings: PluginSettings;
+    #settings: IPluginSettings;
     #fileParser: FileParser;
 
-    public constructor(app: App, settings: PluginSettings) {
+    public constructor(app: App, settings: IPluginSettings) {
         this.#app = app;
         this.#settings = settings;
         this.#fileParser = new FileParser();

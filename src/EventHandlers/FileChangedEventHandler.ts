@@ -1,14 +1,14 @@
 import TasksTimeTrackerPlugin from "main";
 import FileChangedEvent from "src/Events/FileChangedEvent";
 import Interval from "src/Settings/Interval";
-import PluginSettings from "src/Settings/PluginSettings";
+import IPluginSettings from "src/Settings/IPluginSettings";
 import TaskLog from "src/Settings/TaskLog";
 
 export default class FileChangedEventHandler {
-    #settings: PluginSettings;
+    #settings: IPluginSettings;
     #plugin: TasksTimeTrackerPlugin;
 
-    public constructor(settings: PluginSettings, plugin: TasksTimeTrackerPlugin) {
+    public constructor(settings: IPluginSettings, plugin: TasksTimeTrackerPlugin) {
         this.#settings = settings;
         this.#plugin = plugin;
     }

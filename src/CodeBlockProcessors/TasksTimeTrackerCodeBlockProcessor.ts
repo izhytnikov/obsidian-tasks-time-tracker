@@ -1,12 +1,12 @@
 import { MarkdownPostProcessorContext, Vault } from "obsidian";
 import TimeTrackerRenderer from "src/Renderers/TimeTrackerRenderer";
-import PluginSettings from "src/Settings/PluginSettings";
+import IPluginSettings from "src/Settings/IPluginSettings";
 
 export default class TasksTimeTrackerCodeBlockProcessor {
-    #settings: PluginSettings;
+    #settings: IPluginSettings;
     #vault: Vault;
 
-    public constructor(settings: PluginSettings, vault: Vault) {
+    public constructor(settings: IPluginSettings, vault: Vault) {
         this.#settings = settings;
         this.#vault = vault;
     }
