@@ -2,6 +2,7 @@ import { MarkdownRenderChild } from "obsidian";
 import TaskLog from "src/Settings/TaskLog";
 import { Nullable } from "src/Utils/Nullable";
 import Interval from "src/Settings/Interval";
+import { EMPTY_STRING } from "src/Constants";
 
 export class Duration {
     #hours: number;
@@ -130,6 +131,6 @@ export default class TimeTrackerRenderer extends MarkdownRenderChild {
     }
 
     private getTimeString(dateString: Nullable<string>): string {
-        return dateString !== null ? new Date(dateString).toLocaleTimeString([], { hour12: false }) : "";
+        return dateString !== null ? new Date(dateString).toLocaleTimeString([], { hour12: false }) : EMPTY_STRING;
     }
 }

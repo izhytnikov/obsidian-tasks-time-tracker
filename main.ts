@@ -5,7 +5,7 @@ import FileChangedEvent from "src/Events/FileChangedEvent";
 import IPluginSettings from "src/Settings/IPluginSettings";
 import FileChangedEventHandler from "src/EventHandlers/FileChangedEventHandler";
 import TasksTimeTrackerCodeBlockProcessor from "src/CodeBlockProcessors/TasksTimeTrackerCodeBlockProcessor";
-import InProgressTaskStatusSymbolPluginSettingTab from "src/PluginSettingTabs/InProgressTaskStatusSymbolPluginSettingTab";
+import TasksTimeTrackerPluginSettingTab from "src/PluginSettingTabs/TasksTimeTrackerPluginSettingTab";
 
 export default class TasksTimeTrackerPlugin extends Plugin {
 	#settings: IPluginSettings;
@@ -44,6 +44,6 @@ export default class TasksTimeTrackerPlugin extends Plugin {
 	}
 
 	#addSettingTabs(): void {
-		this.addSettingTab(new InProgressTaskStatusSymbolPluginSettingTab(this.app, this, this.#settings));
+		this.addSettingTab(new TasksTimeTrackerPluginSettingTab(this.app, this, this.#settings));
 	}
 }
