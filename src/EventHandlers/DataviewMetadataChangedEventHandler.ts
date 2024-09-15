@@ -27,13 +27,13 @@ export default class DataviewMetadataChangedEventHandler {
                         const isTaskInProgress = task.hasStatusSymbol(this.#settingService.getInProgressTaskStatusSymbol());
                         const dateTaskLog = accumulator.find(dateTaskLog => dateTaskLog.getDate().getTime() === taskScheduledDate.getTime());
                         if (!dateTaskLog) {
-                            accumulator.push(new DateTaskLog(taskScheduledDate, isTaskInProgress))
+                            accumulator.push(new DateTaskLog(taskScheduledDate, isTaskInProgress));
                         } else {
                             dateTaskLog.setTaskInProgress(dateTaskLog.isTaskInProgress() || isTaskInProgress);
                         }
 
                         return accumulator;
-                    }, [] as DateTaskLog[])
+                    }, [] as DateTaskLog[]);
 
                     this.#eventService.triggerFileChangedEvent(new FileChangedEvent(file.basename, file.path, dateTaskLogs));
                 }

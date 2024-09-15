@@ -33,7 +33,7 @@ export default class SettingService implements ISettingService {
 
         if (taskLogs === null) {
             if (isTaskInProgress) {
-                this.#settingRepository.addDateLog(logKey, [new TaskLog(taskName, [new Interval(nowDate)])])
+                this.#settingRepository.addDateLog(logKey, [new TaskLog(taskName, [new Interval(nowDate)])]);
             }
         } else {
             const taskLogIndex = taskLogs.findIndex(taskLog => taskLog.taskName === taskName);

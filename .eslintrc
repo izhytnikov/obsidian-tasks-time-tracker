@@ -23,6 +23,7 @@
       "@typescript-eslint/explicit-function-return-type": "error",
       "@typescript-eslint/explicit-member-accessibility": "error",
       "@typescript-eslint/explicit-module-boundary-types": "error",
+      "@typescript-eslint/member-ordering": "error",
       "@typescript-eslint/naming-convention": [
         "error",
         {
@@ -32,6 +33,7 @@
         }
       ],
       "quotes": ["error", "double"],
-      "semi": ["error", "always"]
+      "semi": "off",
+      "@typescript-eslint/semi": ["error"]
     } 
   }

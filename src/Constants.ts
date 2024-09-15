@@ -4,7 +4,7 @@ export const DEFAULT_SETTINGS: IPluginSettings = {
     inProgressTaskStatusSymbol: "/",
     taskTypesSettings: [],
     dateLogs: {}
-}
+};
 
 export const EVENTS = {
     DATAVIEW: {
@@ -14,7 +14,7 @@ export const EVENTS = {
     TASKS_TIME_TRACKER: {
         FILE_CHANGED: "tasks-time-tracker:file-changed"
     }
-}
+};
 
 export const SUBPATHS_SEPARATOR_SYMBOL = ",";
 
