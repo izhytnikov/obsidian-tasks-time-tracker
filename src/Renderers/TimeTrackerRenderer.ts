@@ -116,12 +116,12 @@ export default class TimeTrackerRenderer extends MarkdownRenderChild {
                 if (intervalIndex === taskLog.intervals.length - 1 && taskDurationCell) {
                     taskDurationCell.innerText = taskDuration.toString();
                 }
-            })
+            });
 
             if (taskLogIndex === this.#taskLogs.length - 1 && dayDurationCell) {
                 dayDurationCell.innerText = dayDuration.toString();
             }
-        })
+        });
     }
 
     private deleteTimeTrackerTableRows(): void {

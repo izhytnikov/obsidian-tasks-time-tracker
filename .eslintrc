@@ -31,6 +31,7 @@
           "prefix": ["I"]
         }
       ],
-      "quotes": ["error", "double"]
+      "quotes": ["error", "double"],
+      "semi": ["error", "always"]
     } 
   }

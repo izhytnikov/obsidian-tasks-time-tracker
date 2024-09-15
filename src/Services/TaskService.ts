@@ -15,10 +15,10 @@ export default class TaskService implements ITaskService {
 
         return tasks.reduce((accumulator, task) => {
             if (task.scheduled && subPaths.includes(task.header.subpath)) {
-                accumulator.push(new Task(task.status, task.scheduled.toJSDate()))
+                accumulator.push(new Task(task.status, task.scheduled.toJSDate()));
             }
 
-            return accumulator
+            return accumulator;
         }, [] as Task[]);
     }
 }

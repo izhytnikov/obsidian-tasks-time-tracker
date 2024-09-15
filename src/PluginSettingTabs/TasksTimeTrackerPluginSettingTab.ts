@@ -36,7 +36,7 @@ export default class TasksTimeTrackerPluginSettingTab extends PluginSettingTab {
             .addExtraButton((button) => {
                 button.setIcon("plus-circle")
                     .setTooltip("Add a new task type")
-                    .onClick(() => this.openCreateTaskTypeSettingsModal())
+                    .onClick(() => this.openCreateTaskTypeSettingsModal());
             });
 
         this.#settingService.getTaskTypesSettings().forEach((taskTypeSettings, index) => {
@@ -46,7 +46,7 @@ export default class TasksTimeTrackerPluginSettingTab extends PluginSettingTab {
                 .addExtraButton((button) => {
                     button.setIcon("edit")
                         .setTooltip("Edit a task type")
-                        .onClick(() => this.openEditTaskTypeSettingsModal(index, taskTypeSettings))
+                        .onClick(() => this.openEditTaskTypeSettingsModal(index, taskTypeSettings));
                 })
                 .addExtraButton((button) => {
                     button.setIcon("trash")
@@ -54,9 +54,9 @@ export default class TasksTimeTrackerPluginSettingTab extends PluginSettingTab {
                         .onClick(async () => {
                             this.#settingService.deleteTaskTypeSettings(index);
                             this.display();
-                        })
+                        });
                 });
-        })
+        });
     }
 
     private openCreateTaskTypeSettingsModal(): void {

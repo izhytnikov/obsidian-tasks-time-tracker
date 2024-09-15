@@ -36,14 +36,14 @@ export default class SettingRepository implements ISettingRepository {
     public async updateTaskTypeSettings(taskTypeSettingsIndex: number, updatedTaskTypeSettings: TaskTypeSettings): Promise<void> {
         this.#settings.taskTypesSettings = this.#settings.taskTypesSettings.map((taskTypeSettings, index) => {
             if (index !== taskTypeSettingsIndex) {
-                return taskTypeSettings
+                return taskTypeSettings;
             }
 
             return {
                 ...taskTypeSettings,
                 ...updatedTaskTypeSettings
-            }
-        })
+            };
+        });
 
         return this.#saveSettings();
     }
