@@ -74,12 +74,12 @@ export default class TimeTrackerRenderer extends MarkdownRenderChild {
     public onload(): void {
         this.#timeTrackerTable = this.containerEl.createEl("table");
         this.registerInterval(window.setInterval(() => {
-            this.drawTimeTrackerTable();
+            this.#drawTimeTrackerTable();
         }, 1000));
     }
 
-    private drawTimeTrackerTable(): void {
-        this.deleteTimeTrackerTableRows();
+    #drawTimeTrackerTable(): void {
+        this.#deleteTimeTrackerTableRows();
 
         const headerRow = this.#timeTrackerTable.createEl("tr");
         headerRow.createEl("th", { text: "Task" });
@@ -104,8 +104,8 @@ export default class TimeTrackerRenderer extends MarkdownRenderChild {
                 if (intervalIndex === 0) {
                     row.createEl("td", { text: taskLog.taskName, attr: { rowspan: taskLog.intervals.length.toString() } });
                 }
-                row.createEl("td", { text: this.getTimeString(interval.startDateString) });
-                row.createEl("td", { text: this.getTimeString(interval.endDateString) });
+                row.createEl("td", { text: this.#getTimeString(interval.startDateString) });
+                row.createEl("td", { text: this.#getTimeString(interval.endDateString) });
                 row.createEl("td", { text: intervalDuration.toString() });
                 if (intervalIndex === 0) {
                     taskDurationCell = row.createEl("td", { attr: { rowspan: taskLog.intervals.length.toString() } });
@@ -124,13 +124,13 @@ export default class TimeTrackerRenderer extends MarkdownRenderChild {
         });
     }
 
-    private deleteTimeTrackerTableRows(): void {
+    #deleteTimeTrackerTableRows(): void {
         while (this.#timeTrackerTable.rows.length > 0) {
             this.#timeTrackerTable.deleteRow(0);
         }
     }
 
-    private getTimeString(dateString: Nullable<string>): string {
+    #getTimeString(dateString: Nullable<string>): string {
         return dateString !== null ? new Date(dateString).toLocaleTimeString([], { hour12: false }) : EMPTY_STRING;
     }
 }

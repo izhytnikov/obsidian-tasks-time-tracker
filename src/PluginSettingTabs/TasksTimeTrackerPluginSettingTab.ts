@@ -36,7 +36,7 @@ export default class TasksTimeTrackerPluginSettingTab extends PluginSettingTab {
             .addExtraButton((button) => {
                 button.setIcon("plus-circle")
                     .setTooltip("Add a new task type")
-                    .onClick(() => this.openCreateTaskTypeSettingsModal());
+                    .onClick(() => this.#openCreateTaskTypeSettingsModal());
             });
 
         this.#settingService.getTaskTypesSettings().forEach((taskTypeSettings, index) => {
@@ -46,7 +46,7 @@ export default class TasksTimeTrackerPluginSettingTab extends PluginSettingTab {
                 .addExtraButton((button) => {
                     button.setIcon("edit")
                         .setTooltip("Edit a task type")
-                        .onClick(() => this.openEditTaskTypeSettingsModal(index, taskTypeSettings));
+                        .onClick(() => this.#openEditTaskTypeSettingsModal(index, taskTypeSettings));
                 })
                 .addExtraButton((button) => {
                     button.setIcon("trash")
@@ -59,23 +59,23 @@ export default class TasksTimeTrackerPluginSettingTab extends PluginSettingTab {
         });
     }
 
-    private openCreateTaskTypeSettingsModal(): void {
-        return this.openTaskTypeSettingsModal(
+    #openCreateTaskTypeSettingsModal(): void {
+        return this.#openTaskTypeSettingsModal(
             "Create a task type",
             async (taskTypeSettings) => this.#settingService.addTaskTypeSettings(taskTypeSettings),
             new TaskTypeSettings()
         );
     }
 
-    private openEditTaskTypeSettingsModal(taskTypeSettingsIndex: number, taskTypeSettings: TaskTypeSettings): void {
-        return this.openTaskTypeSettingsModal(
+    #openEditTaskTypeSettingsModal(taskTypeSettingsIndex: number, taskTypeSettings: TaskTypeSettings): void {
+        return this.#openTaskTypeSettingsModal(
             "Edit a task type",
             async (taskTypeSettings) => this.#settingService.updateTaskTypeSettings(taskTypeSettingsIndex, taskTypeSettings),
             taskTypeSettings
         );
     }
 
-    private openTaskTypeSettingsModal(modalHeaderText: string, onSubmitCallback: ActionWithParameter<TaskTypeSettings>, taskTypeSettings: TaskTypeSettings): void {
+    #openTaskTypeSettingsModal(modalHeaderText: string, onSubmitCallback: ActionWithParameter<TaskTypeSettings>, taskTypeSettings: TaskTypeSettings): void {
         new TaskTypeSettingsModal(
             this.#plugin.app,
             modalHeaderText,

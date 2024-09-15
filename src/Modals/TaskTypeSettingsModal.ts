@@ -4,7 +4,7 @@ import TaskTypeSettings from "src/Settings/TaskTypeSettings";
 import { Action, ActionWithParameter } from "src/Utils/Delegates";
 
 export default class TaskTypeSettingsModal extends Modal {
-    #modalHeaderText: string
+    #modalHeaderText: string;
     #onSubmitCallback: ActionWithParameter<TaskTypeSettings>;
     #onCloseCallback: Action;
     #taskTypeSettings: TaskTypeSettings;
@@ -31,7 +31,7 @@ export default class TaskTypeSettingsModal extends Modal {
                     .setValue(this.#taskTypeSettings.path ?? EMPTY_STRING)
                     .onChange((value) => {
                         this.#taskTypeSettings.path = value;
-                        this.setSubmitButtonDisabled();
+                        this.#setSubmitButtonDisabled();
                     })
             );
 
@@ -45,7 +45,7 @@ export default class TaskTypeSettingsModal extends Modal {
                         this.#taskTypeSettings.subpaths = value.split(SUBPATHS_SEPARATOR_SYMBOL)
                             .map(subpath => subpath.trim())
                             .filter(subpath => subpath !== EMPTY_STRING);
-                        this.setSubmitButtonDisabled();
+                        this.#setSubmitButtonDisabled();
                     })
             );
 
@@ -57,7 +57,7 @@ export default class TaskTypeSettingsModal extends Modal {
                         this.close();
                     }));
 
-        this.setSubmitButtonDisabled();
+        this.#setSubmitButtonDisabled();
     }
 
     public onClose(): void {
@@ -66,7 +66,7 @@ export default class TaskTypeSettingsModal extends Modal {
         this.#onCloseCallback();
     }
 
-    private setSubmitButtonDisabled(): void {
+    #setSubmitButtonDisabled(): void {
         const isTaskTypeSettingsValid = this.#taskTypeSettings.path !== null
             && this.#taskTypeSettings.path !== EMPTY_STRING
             && this.#taskTypeSettings.subpaths.length !== 0;
