@@ -2,19 +2,18 @@ import TasksTimeTrackerPlugin from "main";
 import { App, PluginSettingTab, Setting } from "obsidian";
 import { EMPTY_STRING, SUBPATHS_SEPARATOR_SYMBOL } from "src/Constants";
 import TaskTypeSettingsModal from "src/Modals/TaskTypeSettingsModal";
-import IPluginSettings from "src/Settings/IPluginSettings";
+import ISettingService from "src/Services/ISettingService";
 import TaskTypeSettings from "src/Settings/TaskTypeSettings";
 import { ActionWithParameter } from "src/Utils/Delegates";
-import { Nullable } from "src/Utils/Nullable";
 
 export default class TasksTimeTrackerPluginSettingTab extends PluginSettingTab {
     #plugin: TasksTimeTrackerPlugin;
-    #settings: IPluginSettings;
+    #settingService: ISettingService;
 
-    public constructor(app: App, plugin: TasksTimeTrackerPlugin, settings: IPluginSettings) {
+    public constructor(app: App, plugin: TasksTimeTrackerPlugin, settingService: ISettingService) {
         super(app, plugin);
         this.#plugin = plugin;
-        this.#settings = settings;
+        this.#settingService = settingService;
     }
 
     public display(): void {
@@ -27,11 +26,8 @@ export default class TasksTimeTrackerPluginSettingTab extends PluginSettingTab {
             .setDesc("Represents the symbol used to indicate the status of tasks that are currently in progress.")
             .addText((text) =>
                 text.setPlaceholder("/")
-                    .setValue(this.#settings.inProgressTaskStatusSymbol)
-                    .onChange(async (value) => {
-                        this.#settings.inProgressTaskStatusSymbol = value;
-                        await this.#plugin.saveSettings();
-                    })
+                    .setValue(this.#settingService.getInProgressTaskStatusSymbol())
+                    .onChange(async (value) => this.#settingService.updateInProgressTaskStatusSymbol(value))
             );
 
         new Setting(containerEl)
@@ -43,24 +39,20 @@ export default class TasksTimeTrackerPluginSettingTab extends PluginSettingTab {
                     .onClick(() => this.openCreateTaskTypeSettingsModal())
             });
 
-        this.#settings.taskTypesSettings.forEach((taskTypeSettings, index) => {
+        this.#settingService.getTaskTypesSettings().forEach((taskTypeSettings, index) => {
             new Setting(containerEl)
                 .setName(taskTypeSettings.path ?? EMPTY_STRING)
                 .setDesc(taskTypeSettings.subpaths.join(`${SUBPATHS_SEPARATOR_SYMBOL} `))
                 .addExtraButton((button) => {
                     button.setIcon("edit")
                         .setTooltip("Edit a task type")
-                        .onClick(() => this.openEditTaskTypeSettingsModal(taskTypeSettings))
+                        .onClick(() => this.openEditTaskTypeSettingsModal(index, taskTypeSettings))
                 })
                 .addExtraButton((button) => {
                     button.setIcon("trash")
                         .setTooltip("Delete a task type")
                         .onClick(async () => {
-                            this.#settings.taskTypesSettings = [
-                                ...this.#settings.taskTypesSettings.slice(0, index),
-                                ...this.#settings.taskTypesSettings.slice(index + 1)
-                            ];
-                            await this.#plugin.saveSettings();
+                            this.#settingService.deleteTaskTypeSettings(index);
                             this.display();
                         })
                 });
@@ -70,29 +62,26 @@ export default class TasksTimeTrackerPluginSettingTab extends PluginSettingTab {
     private openCreateTaskTypeSettingsModal(): void {
         return this.openTaskTypeSettingsModal(
             "Create a task type",
-            async (taskTypeSettings) => {
-                this.#settings.taskTypesSettings.push(taskTypeSettings);
-                await this.#plugin.saveSettings();
-            },
+            async (taskTypeSettings) => this.#settingService.addTaskTypeSettings(taskTypeSettings),
             new TaskTypeSettings()
         );
     }
 
-    private openEditTaskTypeSettingsModal(taskTypeSettings: TaskTypeSettings): void {
+    private openEditTaskTypeSettingsModal(taskTypeSettingsIndex: number, taskTypeSettings: TaskTypeSettings): void {
         return this.openTaskTypeSettingsModal(
             "Edit a task type",
-            async (_) => await this.#plugin.saveSettings(),
+            async (taskTypeSettings) => this.#settingService.updateTaskTypeSettings(taskTypeSettingsIndex, taskTypeSettings),
             taskTypeSettings
         );
     }
 
-    private openTaskTypeSettingsModal(modalHeaderText: string, onSubmitCallback: ActionWithParameter<TaskTypeSettings>, taskTypeSettings: Nullable<TaskTypeSettings>): void {
+    private openTaskTypeSettingsModal(modalHeaderText: string, onSubmitCallback: ActionWithParameter<TaskTypeSettings>, taskTypeSettings: TaskTypeSettings): void {
         new TaskTypeSettingsModal(
             this.#plugin.app,
             modalHeaderText,
             onSubmitCallback,
             () => this.display(),
-            taskTypeSettings ?? new TaskTypeSettings()
+            taskTypeSettings
         ).open();
     }
 }

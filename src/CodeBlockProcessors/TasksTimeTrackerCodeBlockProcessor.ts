@@ -1,23 +1,23 @@
-import { MarkdownPostProcessorContext, Vault } from "obsidian";
+import { MarkdownPostProcessorContext } from "obsidian";
 import TimeTrackerRenderer from "src/Renderers/TimeTrackerRenderer";
-import IPluginSettings from "src/Settings/IPluginSettings";
+import IFileService from "src/Services/IFileService";
+import ISettingService from "src/Services/ISettingService";
 
 export default class TasksTimeTrackerCodeBlockProcessor {
-    #settings: IPluginSettings;
-    #vault: Vault;
+    #settingService: ISettingService;
+    #fileService: IFileService;
 
-    public constructor(settings: IPluginSettings, vault: Vault) {
-        this.#settings = settings;
-        this.#vault = vault;
+    public constructor(settingService: ISettingService, fileService: IFileService) {
+        this.#settingService = settingService;
+        this.#fileService = fileService;
     }
 
     public process(element: HTMLElement, context: MarkdownPostProcessorContext): void {
-        const file = this.#vault.getFileByPath(context.sourcePath);
+        const file = this.#fileService.getFileByPath(context.sourcePath);
         if (file !== null) {
-            const logKey = new Date(`${file.basename}T00:00:00`).toDateString();
-            const dateLog = this.#settings.dateLogs[logKey]
-            if (dateLog) {
-                const renderer = new TimeTrackerRenderer(element, dateLog);
+            const taskLogs = this.#settingService.getTaskLogsByDate(new Date(`${file.basename}T00:00:00`));
+            if (taskLogs !== null) {
+                const renderer = new TimeTrackerRenderer(element, taskLogs);
                 context.addChild(renderer);
             }
         }

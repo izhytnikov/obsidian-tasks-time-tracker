@@ -58,7 +58,6 @@ export default class TaskTypeSettingsModal extends Modal {
                     }));
 
         this.setSubmitButtonDisabled();
-
     }
 
     public onClose(): void {
