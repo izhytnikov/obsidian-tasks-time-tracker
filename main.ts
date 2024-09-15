@@ -2,7 +2,6 @@ import { Events, Plugin, TFile } from "obsidian";
 import { DEFAULT_SETTINGS, EVENTS, TASKS_TIME_TRACKER_CODE_BLOCK_NAME } from "src/Constants";
 import DataviewMetadataChangedEventHandler from "src/EventHandlers/DataviewMetadataChangedEventHandler";
 import FileChangedEvent from "src/Services/Models/FileChangedEvent";
-import IPluginSettings from "src/Settings/IPluginSettings";
 import FileChangedEventHandler from "src/EventHandlers/FileChangedEventHandler";
 import TasksTimeTrackerCodeBlockProcessor from "src/CodeBlockProcessors/TasksTimeTrackerCodeBlockProcessor";
 import TasksTimeTrackerPluginSettingTab from "src/PluginSettingTabs/TasksTimeTrackerPluginSettingTab";
@@ -13,33 +12,27 @@ import SettingRepository from "src/Repositories/SettingRepository";
 import FileService from "src/Services/FileService";
 import FileRepository from "src/Repositories/FileRepository";
 import EventService from "src/Services/EventService";
+import ISettingService from "src/Services/ISettingService";
 
 export default class TasksTimeTrackerPlugin extends Plugin {
-	#settings: IPluginSettings;
+	#settingService: ISettingService;
 
 	public async onload(): Promise<void> {
-		await this.loadSettings();
+		const settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+		this.#settingService = new SettingService(new SettingRepository(settings, this));
 
 		this.#registerEvents();
 		this.#registerMarkdownCodeBlockProcessors();
 		this.#addSettingTabs();
 	}
 
-	public async loadSettings(): Promise<void> {
-		this.#settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
-	}
-
-	public async saveSettings(): Promise<void> {
-		await this.saveData(this.#settings);
-	}
-
 	#registerEvents(): void {
 		const metadataChangedEventHandler = new DataviewMetadataChangedEventHandler(
 			new TaskService(new TaskRepository()),
 			new EventService(this.app.vault),
-			new SettingService(new SettingRepository(this.#settings, this))
+			this.#settingService
 		);
-		const fileChangedEventHandler = new FileChangedEventHandler(new SettingService(new SettingRepository(this.#settings, this)));
+		const fileChangedEventHandler = new FileChangedEventHandler(this.#settingService);
 
 		this.registerEvent((this.app.metadataCache as Events)
 			.on(EVENTS.DATAVIEW.METADATA_CHANGE, (eventName: string, file: TFile) => metadataChangedEventHandler.handle(eventName, file)));
@@ -49,7 +42,7 @@ export default class TasksTimeTrackerPlugin extends Plugin {
 
 	#registerMarkdownCodeBlockProcessors(): void {
 		const tasksTimeTrackerCodeBlockProcessor = new TasksTimeTrackerCodeBlockProcessor(
-			new SettingService(new SettingRepository(this.#settings, this)),
+			this.#settingService,
 			new FileService(new FileRepository(this.app.vault))
 		);
 
@@ -61,7 +54,7 @@ export default class TasksTimeTrackerPlugin extends Plugin {
 		this.addSettingTab(new TasksTimeTrackerPluginSettingTab(
 			this.app,
 			this,
-			new SettingService(new SettingRepository(this.#settings, this))
+			this.#settingService
 		));
 	}
 }
