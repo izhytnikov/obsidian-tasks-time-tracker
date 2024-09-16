@@ -15,11 +15,8 @@ export default class TasksTimeTrackerCodeBlockProcessor {
     public process(element: HTMLElement, context: MarkdownPostProcessorContext): void {
         const file = this.#fileService.getFileByPath(context.sourcePath);
         if (file !== null) {
-            const taskLogs = this.#settingService.getTaskLogsByDate(new Date(`${file.basename}T00:00:00`));
-            if (taskLogs !== null) {
-                const renderer = new TimeTrackerRenderer(element, taskLogs);
-                context.addChild(renderer);
-            }
+            const renderer = new TimeTrackerRenderer(element, this.#settingService, new Date(`${file.basename}T00:00:00`));
+            context.addChild(renderer);
         }
     }
 }
