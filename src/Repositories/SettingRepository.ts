@@ -1,17 +1,20 @@
 import { DateLogs } from "src/Settings/DateLogs";
 import TaskTypeSettings from "src/Settings/TaskTypeSettings";
 import ISettingRepository from "./ISettingRepository";
-import IPluginSettings from "src/Settings/IPluginSettings";
+import type IPluginSettings from "src/Settings/IPluginSettings";
 import { Plugin } from "obsidian";
 import { clone, cloneDeep } from "lodash";
 import TaskLog from "src/Settings/TaskLog";
 import Interval from "src/Settings/Interval";
+import { inject, injectable } from "tsyringe";
 
+@injectable()
 export default class SettingRepository implements ISettingRepository {
-    #settings: IPluginSettings;
     #plugin: Plugin;
+    #settings: IPluginSettings;
 
-    public constructor(settings: IPluginSettings, plugin: Plugin) {
+    public constructor(@inject("Plugin") plugin: Plugin,
+        @inject("IPluginSettings") settings: IPluginSettings) {
         this.#settings = settings;
         this.#plugin = plugin;
     }

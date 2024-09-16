@@ -1,13 +1,16 @@
 import { MarkdownPostProcessorContext } from "obsidian";
 import TimeTrackerRenderer from "src/Renderers/TimeTrackerRenderer";
-import IFileService from "src/Services/IFileService";
-import ISettingService from "src/Services/ISettingService";
+import type IFileService from "src/Services/IFileService";
+import type ISettingService from "src/Services/ISettingService";
+import { inject, injectable } from "tsyringe";
 
+@injectable()
 export default class TasksTimeTrackerCodeBlockProcessor {
     #settingService: ISettingService;
     #fileService: IFileService;
 
-    public constructor(settingService: ISettingService, fileService: IFileService) {
+    public constructor(@inject("ISettingService") settingService: ISettingService,
+        @inject("IFileService") fileService: IFileService) {
         this.#settingService = settingService;
         this.#fileService = fileService;
     }

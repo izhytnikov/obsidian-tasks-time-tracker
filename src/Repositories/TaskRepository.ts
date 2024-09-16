@@ -1,6 +1,8 @@
 import { DataObject, DataviewApi, getAPI } from "obsidian-dataview";
 import ITaskRepository from "./ITaskRepository";
+import { injectable } from "tsyringe";
 
+@injectable()
 export default class TaskRepository implements ITaskRepository {
     #dataviewApi: DataviewApi;
 

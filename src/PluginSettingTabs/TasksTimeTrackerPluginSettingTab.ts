@@ -2,15 +2,19 @@ import TasksTimeTrackerPlugin from "main";
 import { App, PluginSettingTab, Setting } from "obsidian";
 import { EMPTY_STRING, SUBPATHS_SEPARATOR_SYMBOL } from "src/Constants";
 import TaskTypeSettingsModal from "src/Modals/TaskTypeSettingsModal";
-import ISettingService from "src/Services/ISettingService";
+import type ISettingService from "src/Services/ISettingService";
 import TaskTypeSettings from "src/Settings/TaskTypeSettings";
 import { ActionWithParameter } from "src/Utils/Delegates";
+import { inject, injectable } from "tsyringe";
 
+@injectable()
 export default class TasksTimeTrackerPluginSettingTab extends PluginSettingTab {
     #plugin: TasksTimeTrackerPlugin;
     #settingService: ISettingService;
 
-    public constructor(app: App, plugin: TasksTimeTrackerPlugin, settingService: ISettingService) {
+    public constructor(@inject(App) app: App,
+        @inject("Plugin") plugin: TasksTimeTrackerPlugin,
+        @inject("ISettingService") settingService: ISettingService) {
         super(app, plugin);
         this.#plugin = plugin;
         this.#settingService = settingService;

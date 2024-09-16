@@ -2,11 +2,13 @@ import { Vault } from "obsidian";
 import IEventService from "./IEventService";
 import FileChangedEvent from "./Models/FileChangedEvent";
 import { EVENTS } from "src/Constants";
+import { inject, injectable } from "tsyringe";
 
+@injectable()
 export default class EventService implements IEventService {
     #vault: Vault;
 
-    public constructor(vault: Vault) {
+    public constructor(@inject(Vault) vault: Vault) {
         this.#vault = vault;
     }
 

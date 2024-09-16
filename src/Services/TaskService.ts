@@ -1,12 +1,14 @@
 
+import { inject, injectable } from "tsyringe";
 import ITaskService from "./ITaskService";
 import { Task } from "./Models/Task";
-import ITaskRepository from "src/Repositories/ITaskRepository";
+import type ITaskRepository from "src/Repositories/ITaskRepository";
 
+@injectable()
 export default class TaskService implements ITaskService {
     #taskRepository: ITaskRepository;
 
-    public constructor(taskRepository: ITaskRepository) {
+    public constructor(@inject("ITaskRepository") taskRepository: ITaskRepository) {
         this.#taskRepository = taskRepository;
     }
 

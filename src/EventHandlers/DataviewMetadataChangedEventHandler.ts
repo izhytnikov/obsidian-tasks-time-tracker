@@ -1,17 +1,21 @@
 import { TFile } from "obsidian";
 import { EVENTS } from "src/Constants";
-import ITaskService from "src/Services/ITaskService";
+import type ITaskService from "src/Services/ITaskService";
 import DateTaskLog from "src/Services/Models/DateTaskLog";
 import FileChangedEvent from "src/Services/Models/FileChangedEvent";
-import IEventService from "src/Services/IEventService";
-import ISettingService from "src/Services/ISettingService";
+import type IEventService from "src/Services/IEventService";
+import type ISettingService from "src/Services/ISettingService";
+import { inject, injectable } from "tsyringe";
 
+@injectable()
 export default class DataviewMetadataChangedEventHandler {
     #taskService: ITaskService;
     #eventService: IEventService;
     #settingService: ISettingService;
 
-    public constructor(taskService: ITaskService, eventService: IEventService, settingService: ISettingService) {
+    public constructor(@inject("ITaskService") taskService: ITaskService,
+        @inject("IEventService") eventService: IEventService,
+        @inject("ISettingService") settingService: ISettingService) {
         this.#taskService = taskService;
         this.#eventService = eventService;
         this.#settingService = settingService;

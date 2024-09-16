@@ -1,14 +1,16 @@
 import TaskLog from "src/Settings/TaskLog";
 import ISettingService from "./ISettingService";
-import ISettingRepository from "src/Repositories/ISettingRepository";
+import type ISettingRepository from "src/Repositories/ISettingRepository";
 import TaskTypeSettings from "src/Settings/TaskTypeSettings";
 import { Nullable } from "src/Utils/Nullable";
 import Interval from "src/Settings/Interval";
+import { inject, injectable } from "tsyringe";
 
+@injectable()
 export default class SettingService implements ISettingService {
     #settingRepository: ISettingRepository;
 
-    public constructor(settingRepository: ISettingRepository) {
+    public constructor(@inject("ISettingRepository") settingRepository: ISettingRepository) {
         this.#settingRepository = settingRepository;
     }
 
