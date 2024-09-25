@@ -1,0 +1,10 @@
+export class TFile {
+    public basename: string;
+    public extension: string;
+}
+
+export const Vault = jest.fn().mockImplementation(() => {
+    return {
+        getFileByPath: jest.fn(path => path === "Existing path" ? new TFile : null)
+    };
+});
