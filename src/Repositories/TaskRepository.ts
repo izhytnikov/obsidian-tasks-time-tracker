@@ -12,10 +12,6 @@ export default class TaskRepository implements ITaskRepository {
 
     public getTasksByPath(path: string): DataObject[] {
         const page = this.#dataviewApi.page(path);
-        if (page == null) {
-            return [];
-        }
-
-        return page.file.tasks.values;
+        return page?.file?.tasks?.values ?? [];
     }
 }
