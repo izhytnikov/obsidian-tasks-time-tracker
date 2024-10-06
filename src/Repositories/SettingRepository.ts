@@ -3,7 +3,7 @@ import TaskTypeSettings from "src/Settings/TaskTypeSettings";
 import ISettingRepository from "./ISettingRepository";
 import type IPluginSettings from "src/Settings/IPluginSettings";
 import { Plugin } from "obsidian";
-import { clone, cloneDeep } from "lodash";
+import { cloneDeep } from "lodash";
 import TaskLog from "src/Settings/TaskLog";
 import Interval from "src/Settings/Interval";
 import { inject, injectable } from "tsyringe";
@@ -20,7 +20,7 @@ export default class SettingRepository implements ISettingRepository {
     }
 
     public getInProgressTaskStatusSymbol(): string {
-        return clone(this.#settings.inProgressTaskStatusSymbol);
+        return this.#settings.inProgressTaskStatusSymbol;
     }
 
     public getTaskTypesSettings(): TaskTypeSettings[] {
@@ -52,8 +52,12 @@ export default class SettingRepository implements ISettingRepository {
     }
 
     public async updateTaskLogIntervalEndDate(dateLogKey: string, taskLogIndex: number, intervalIndex: number, endDateString: string): Promise<void> {
-        this.#settings.dateLogs[dateLogKey][taskLogIndex].intervals[intervalIndex].endDateString = endDateString;
-        return this.#saveSettings();
+        const interval = this.#settings.dateLogs[dateLogKey]?.[taskLogIndex]?.intervals?.[intervalIndex] ?? null;
+
+        if (interval !== null) {
+            interval.endDateString = endDateString;
+            return this.#saveSettings();
+        }
     }
 
     public async addTaskTypeSettings(taskTypeSettings: TaskTypeSettings): Promise<void> {
@@ -67,22 +71,32 @@ export default class SettingRepository implements ISettingRepository {
     }
 
     public async addTaskLog(dateLogKey: string, tasklog: TaskLog): Promise<void> {
-        this.#settings.dateLogs[dateLogKey].push(tasklog);
-        return this.#saveSettings();
+        const dateLog = this.#settings.dateLogs[dateLogKey] ?? null;
+
+        if (dateLog !== null) {
+            dateLog.push(tasklog);
+            return this.#saveSettings();   
+        }
     }
 
-    public addTaskLogInterval(dateLogKey: string, taskLogIndex: number, interval: Interval): Promise<void> {
-        this.#settings.dateLogs[dateLogKey][taskLogIndex].intervals.push(interval);
-        return this.#saveSettings();
+    public async addTaskLogInterval(dateLogKey: string, taskLogIndex: number, interval: Interval): Promise<void> {
+        const intervals = this.#settings.dateLogs[dateLogKey]?.[taskLogIndex]?.intervals ?? null;
+
+        if (intervals !== null) {
+            intervals.push(interval);
+            return this.#saveSettings();
+        }
     }
 
     public async deleteTaskTypeSettings(taskTypeSettingsIndex: number): Promise<void> {
-        this.#settings.taskTypesSettings = [
-            ...this.#settings.taskTypesSettings.slice(0, taskTypeSettingsIndex),
-            ...this.#settings.taskTypesSettings.slice(taskTypeSettingsIndex + 1)
-        ];
+        if (taskTypeSettingsIndex >= 0 && taskTypeSettingsIndex < this.#settings.taskTypesSettings.length) {
+            this.#settings.taskTypesSettings = [
+                ...this.#settings.taskTypesSettings.slice(0, taskTypeSettingsIndex),
+                ...this.#settings.taskTypesSettings.slice(taskTypeSettingsIndex + 1)
+            ];
 
-        return this.#saveSettings();
+            return this.#saveSettings();
+        }
     }
 
     async #saveSettings(): Promise<void> {

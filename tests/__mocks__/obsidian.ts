@@ -8,3 +8,9 @@ export const Vault = jest.fn().mockImplementation(() => {
         getFileByPath: jest.fn(path => path === "Existing path" ? new TFile : null)
     };
 });
+
+export const Plugin = jest.fn().mockImplementation(() => {
+    return {
+        saveData: jest.fn()
+    };
+});
